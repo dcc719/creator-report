@@ -387,6 +387,7 @@ img { max-width: 100%; display: block; }
 .featured-card {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
   gap: 0;
   background: var(--white);
   border: 1px solid var(--gray-200);
@@ -395,6 +396,7 @@ img { max-width: 100%; display: block; }
   overflow: hidden;
   transition: box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  max-height: 420px;
 }
 .featured-card:hover {
   box-shadow: var(--shadow-card-hover);
@@ -404,8 +406,8 @@ img { max-width: 100%; display: block; }
 
 .featured-image {
   overflow: hidden;
-  height: 100%;
-  min-height: 380px;
+  min-height: 0;
+  max-height: 420px;
   background: linear-gradient(135deg, var(--gray-950) 0%, var(--gray-800) 100%);
 }
 
@@ -557,6 +559,63 @@ img { max-width: 100%; display: block; }
 
 /* Hidden vault styles */
 .vault-banner,.vault-banner-inner,.vault-cta-inner,.btn-vault,.vault-cta-block,.vault-cta-inline { display: none; }
+
+/* Management CTA (article pages) */
+.mgmt-cta {
+  max-width: 720px;
+  margin: 3rem 0;
+  padding: 0;
+}
+.mgmt-cta-inner {
+  padding: 2rem 2.5rem;
+  background: var(--gray-100);
+  border-left: 3px solid var(--gray-300);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.mgmt-cta-label {
+  font-family: var(--ff-mono);
+  font-size: 0.55rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gray-500);
+  margin-bottom: 0.75rem;
+}
+.mgmt-cta-text {
+  font-size: 0.95rem;
+  color: var(--gray-700);
+  line-height: 1.65;
+  margin-bottom: 1rem;
+}
+.mgmt-cta-link {
+  font-family: var(--ff-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--black);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.mgmt-cta-link:hover { color: var(--accent); }
+
+/* Partner footer banner */
+.partner-banner {
+  padding: 1.25rem 0;
+  background: var(--near-black);
+  text-align: center;
+}
+.partner-banner-inner p {
+  font-family: var(--ff-sans);
+  font-size: 0.8rem;
+  color: var(--gray-400);
+  font-weight: 400;
+}
+.partner-banner-inner a {
+  color: var(--gray-300);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.partner-banner-inner a:hover { color: var(--white); }
 
 /* Image error handling */
 .image-error img {
@@ -1044,7 +1103,7 @@ img { max-width: 100%; display: block; }
     grid-template-columns: 1fr;
   }
   .featured-image {
-    min-height: 280px;
+    max-height: 340px;
   }
 }
 
@@ -1081,8 +1140,9 @@ img { max-width: 100%; display: block; }
   .featured-card {
     grid-template-columns: 1fr;
     margin-bottom: 1rem;
+    max-height: none;
   }
-  .featured-image { min-height: 240px; }
+  .featured-image { max-height: 280px; }
   .featured-content { padding: 2rem; }
   .featured-title { font-size: 1.6rem; }
 
