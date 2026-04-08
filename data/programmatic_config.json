@@ -1,0 +1,40 @@
+{
+  "templates": [
+    {
+      "slug_pattern": "onlyfans-management-{city}",
+      "title_pattern": "OnlyFans Management in {city} — Find the Right Agency",
+      "meta_pattern": "Looking for OnlyFans management in {city}? Guide to finding the right agency for your creator career.",
+      "type": "city",
+      "template": "programmatic.html"
+    },
+    {
+      "slug_pattern": "{niche}-creator-management",
+      "title_pattern": "{niche} Creator Management — Expert Agency Guide",
+      "meta_pattern": "Complete guide to finding professional management for {niche} creators. Compare agencies, pricing, and services.",
+      "type": "niche",
+      "template": "programmatic.html"
+    },
+    {
+      "slug_pattern": "{platform}-creator-agency",
+      "title_pattern": "Best {platform} Creator Agencies in 2026",
+      "meta_pattern": "Top {platform} creator management agencies ranked. Find vetted teams that grow {platform} accounts.",
+      "type": "platform",
+      "template": "programmatic.html"
+    }
+  ],
+  "cities": [
+    "Los Angeles", "Miami", "New York", "Las Vegas", "Austin", "Dallas",
+    "Atlanta", "Phoenix", "Chicago", "Houston", "San Diego", "Denver",
+    "Nashville", "Tampa", "Orlando", "Portland", "Seattle", "Charlotte",
+    "London", "Dubai", "Toronto", "Sydney", "Berlin"
+  ],
+  "niches": [
+    "Fitness", "Cosplay", "Lifestyle", "Fashion", "Gaming", "Music",
+    "Art", "Comedy", "Cooking", "Travel", "Wellness", "Beauty",
+    "Photography", "Dance", "ASMR", "Podcasting"
+  ],
+  "platforms": [
+    "OnlyFans", "Fansly", "Patreon", "YouTube", "TikTok", "Instagram",
+    "Twitch", "Kick", "Twitter", "Chaturbate"
+  ]
+}

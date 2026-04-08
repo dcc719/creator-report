@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | The Creator Report{% endblock %}
+{% block meta_description %}{{ page_meta_description }}{% endblock %}
+{% block canonical_path %}/{{ page_slug }}{% endblock %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "{{ page_title }}",
+    "description": "{{ page_meta_description }}",
+    "author": { "@type": "Organization", "name": "The Creator Report" },
+    "publisher": { "@type": "Organization", "name": "The Creator Report", "url": "{{ site_url }}" },
+    "datePublished": "{{ published_date }}",
+    "mainEntityOfPage": "{{ site_url }}/{{ page_slug }}"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="article-page">
+    <div class="container">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <a href="/">Home</a>
+            <span class="sep">/</span>
+            <span class="current">{{ page_title }}</span>
+        </nav>
+
+        <header class="article-header">
+            <span class="badge badge-guides">{{ template_type | default('Guide') }}</span>
+            <h1 class="article-title">{{ page_title }}</h1>
+            {% if page_subtitle %}
+            <p class="article-subtitle">{{ page_subtitle }}</p>
+            {% endif %}
+        </header>
+
+        <div class="article-body">
+            <!-- Dynamic intro -->
+            <p>{{ intro_text }}</p>
+
+            <!-- City-specific content slot -->
+            {% if city %}
+            <h2>Creator Management in {{ city }}</h2>
+            <p>{{ city_content }}</p>
+            {% endif %}
+
+            <!-- Niche-specific content slot -->
+            {% if niche %}
+            <h2>{{ niche }} Creator Management</h2>
+            <p>{{ niche_content }}</p>
+            {% endif %}
+
+            <!-- Platform-specific content slot -->
+            {% if platform %}
+            <h2>{{ platform }} Management Services</h2>
+            <p>{{ platform_content }}</p>
+            {% endif %}
+
+            <!-- Generic body content -->
+            {{ body_content | safe }}
+
+            <!-- Vault CTA -->
+            <div class="vault-cta-inline">
+                <div class="vault-cta-inner">
+                    <h3>{{ cta_headline | default('Find your perfect management match') }}</h3>
+                    <p>{{ cta_text | default('Vault connects creators with vetted professional management teams.') }}</p>
+                    <a href="https://vaultplacement.com/apply?utm_source=creator-report&utm_medium=programmatic&utm_campaign={{ page_slug }}" target="_blank" rel="noopener" class="btn-vault vault-cta-btn">Apply to Vault &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+        {% if faq_items %}
+        <section class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+            {% for faq in faq_items %}
+            <div class="faq-item">
+                <h3>{{ faq.question }}</h3>
+                <p>{{ faq.answer }}</p>
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+    </div>
+</article>
+{% endblock %}

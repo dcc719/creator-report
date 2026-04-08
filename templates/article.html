@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.meta_title or article.title }} | The Creator Report{% endblock %}
+{% block meta_description %}{{ article.meta_description or article.subtitle }}{% endblock %}
+{% block og_title %}{{ article.meta_title or article.title }}{% endblock %}
+{% block og_description %}{{ article.meta_description or article.subtitle }}{% endblock %}
+{% block og_image %}{{ article.hero_image or (site_url ~ '/og-image') }}{% endblock %}
+{% block canonical_path %}/article/{{ article.slug }}{% endblock %}
+
+{% block meta_extra %}
+<meta property="og:type" content="article">
+<meta property="og:url" content="{{ site_url }}/article/{{ article.slug }}">
+<meta property="article:published_time" content="{{ article.published_date }}">
+<meta property="article:modified_time" content="{{ article.updated_date or article.published_date }}">
+<meta property="article:section" content="{{ article.category }}">
+{% for tag in article.tags %}
+<meta property="article:tag" content="{{ tag }}">
+{% endfor %}
+<meta name="twitter:title" content="{{ article.meta_title or article.title }}">
+<meta name="twitter:description" content="{{ article.meta_description or article.subtitle }}">
+{% if article.hero_image %}<meta name="twitter:image" content="{{ article.hero_image }}">{% endif %}
+{% endblock %}
+
+{% block schema %}
+<!-- Article Schema -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "{{ article.title }}",
+    "description": "{{ article.meta_description or article.subtitle }}",
+    "author": {
+        "@type": "Organization",
+        "name": "{{ article.author }}"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "The Creator Report",
+        "url": "{{ site_url }}"
+    },
+    "datePublished": "{{ article.published_date }}",
+    "dateModified": "{{ article.updated_date or article.published_date }}",
+    "mainEntityOfPage": "{{ site_url }}/article/{{ article.slug }}",
+    "wordCount": {{ (article.content_html | striptags | wordcount) if article.content_html else 0 }},
+    "articleSection": "{{ article.category }}"
+}
+</script>
+
+<!-- BreadcrumbList Schema -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "{{ site_url }}/"
+        },
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "{{ categories[article.category].name if article.category in categories else article.category }}",
+            "item": "{{ site_url }}/category/{{ article.category }}"
+        },
+        {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "{{ article.title }}",
+            "item": "{{ site_url }}/article/{{ article.slug }}"
+        }
+    ]
+}
+</script>
+
+{% if article.faq_items %}
+<!-- FAQPage Schema -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {% for faq in article.faq_items %}
+        {
+            "@type": "Question",
+            "name": "{{ faq.question }}",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "{{ faq.answer }}"
+            }
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+{% endif %}
+{% endblock %}
+
+{% block progress_bar %}
+<div class="reading-progress" id="readingProgress"></div>
+{% endblock %}
+
+{% block content %}
+<article class="article-page" data-slug="{{ article.slug }}" data-category="{{ article.category }}">
+    <div class="container">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <a href="/">Home</a>
+            <span class="sep">/</span>
+            <a href="/category/{{ article.category }}">{{ categories[article.category].name if article.category in categories else article.category }}</a>
+            <span class="sep">/</span>
+            <span class="current">{{ article.title }}</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="article-header">
+            <span class="badge badge-{{ article.category }}">{{ categories[article.category].name if article.category in categories else article.category }}</span>
+            <h1 class="article-title">{{ article.title }}</h1>
+            {% if article.subtitle %}
+            <p class="article-subtitle">{{ article.subtitle }}</p>
+            {% endif %}
+
+            <div class="article-meta">
+                {% if article.author and article.author != "The Creator Report" and article.author != "Staff" %}
+                <span class="author-prominent">By {{ article.author }}</span>
+                {% else %}
+                <span>{{ article.author }}</span>
+                {% endif %}
+                <span>&middot;</span>
+                <span>{{ article.published_date }}</span>
+                <span>&middot;</span>
+                <span>{{ article.read_time_minutes }} min read</span>
+            </div>
+        </header>
+
+        <!-- Hero Image -->
+        {% if article.hero_image %}
+        <div class="article-hero">
+            <img src="{{ article.hero_image }}" alt="{{ article.hero_image_alt or article.title }}">
+            {% if article.hero_image_credit %}
+            <span class="hero-credit">{{ article.hero_image_credit }}</span>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Key Stats (if present) -->
+        {% if article.key_stats %}
+        <div class="key-stats-bar">
+            {% for stat in article.key_stats %}
+            <div class="stat-item">
+                <span class="stat-value">{{ stat.value }}</span>
+                <span class="stat-label">{{ stat.label }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Article Body -->
+        <div class="article-body" id="articleBody">
+            {{ article.content_html | safe }}
+        </div>
+
+        {% if article.inline_images %}
+        <script>
+        (function() {
+            var images = {{ article.inline_images | tojson }};
+            var body = document.getElementById('articleBody');
+            if (!body || !images.length) return;
+
+            // Find all paragraphs and h2/h3 headers
+            var blocks = body.querySelectorAll('p, h2, h3');
+            if (blocks.length < 4) return;
+
+            // Insert images after roughly every 3-4 paragraphs
+            var positions = [];
+            var step = Math.max(3, Math.floor(blocks.length / (images.length + 1)));
+            for (var i = 0; i < images.length; i++) {
+                var idx = Math.min(step * (i + 1), blocks.length - 1);
+                positions.push(idx);
+            }
+
+            // Insert in reverse order so indices stay valid
+            for (var j = positions.length - 1; j >= 0; j--) {
+                var el = blocks[positions[j]];
+                var fig = document.createElement('figure');
+                fig.className = 'article-inline-image';
+                var img = document.createElement('img');
+                img.src = images[j].src;
+                img.alt = images[j].alt;
+                img.loading = 'lazy';
+                fig.appendChild(img);
+                var cap = document.createElement('figcaption');
+                cap.textContent = images[j].alt;
+                fig.appendChild(cap);
+                el.parentNode.insertBefore(fig, el.nextSibling);
+            }
+        })();
+        </script>
+        {% endif %}
+
+        <!-- Pull Quote (if present) -->
+        {% if article.pull_quotes and article.pull_quotes|length > 0 %}
+        <blockquote class="pull-quote">
+            <p>{{ article.pull_quotes[0] }}</p>
+        </blockquote>
+        {% endif %}
+
+        <!-- Subtle Management CTA Footer -->
+        <div class="subtle-cta-footer">
+            <p><a href="https://vaultplacement.com/apply?utm_source=creator-report&utm_medium=article&utm_campaign={{ article.slug }}" target="_blank" rel="noopener">Considering professional management? Learn what to look for.</a></p>
+        </div>
+
+        <!-- FAQ Section -->
+        {% if article.faq_items %}
+        <section class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+            {% for faq in article.faq_items %}
+            <div class="faq-item">
+                <h3>{{ faq.question }}</h3>
+                <p>{{ faq.answer }}</p>
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        <!-- Related Articles -->
+        {% if related %}
+        <section class="related-section">
+            <h2>Related Articles</h2>
+            <div class="card-grid">
+                {% for ra in related %}
+                <a href="/article/{{ ra.slug }}" class="article-card">
+                    {% if ra.hero_image %}
+                    <div class="card-image">
+                        <img src="{{ ra.hero_image }}" alt="{{ ra.hero_image_alt or ra.title }}" loading="lazy">
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <span class="badge badge-{{ ra.category }}">{{ categories[ra.category].name if ra.category in categories else ra.category }}</span>
+                        <h3 class="card-title">{{ ra.title }}</h3>
+                        <p class="card-subtitle">{{ ra.subtitle }}</p>
+                        <div class="card-meta">
+                            <span>{{ ra.read_time_minutes }} min read</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    </div>
+</article>
+{% endblock %}

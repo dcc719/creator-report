@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}The Creator Report — Creator Economy Intelligence{% endblock %}
+{% block meta_description %}The Creator Report delivers authoritative guides, data-driven insights, and breaking news on the creator economy. Your edge in creator management.{% endblock %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "The Creator Report",
+    "url": "{{ site_url }}",
+    "description": "Authoritative editorial coverage of the creator economy.",
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "{{ site_url }}/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+    }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="hero">
+    <div class="container">
+        <p class="hero-label">Intelligence for the Creator Economy</p>
+        <h1 class="hero-title">The Creator<br>Report</h1>
+        <p class="hero-subtitle">Data, analysis, and expert perspective for creators and the teams that scale them.</p>
+    </div>
+</section>
+
+<!-- Latest Section -->
+{% if latest %}
+<section class="section container">
+    <div class="section-header">
+        <h2 class="section-title">Latest</h2>
+    </div>
+    {% if latest[0] %}
+    <!-- Featured latest article -->
+    <a href="/article/{{ latest[0].slug }}" class="featured-card" style="margin-bottom: 1.5rem;">
+        {% if latest[0].hero_image %}
+        <div class="featured-image">
+            <img src="{{ latest[0].hero_image }}" alt="{{ latest[0].hero_image_alt or latest[0].title }}">
+        </div>
+        {% endif %}
+        <div class="featured-content">
+            <span class="badge badge-{{ latest[0].category }}">{{ categories[latest[0].category].name if latest[0].category in categories else latest[0].category }}</span>
+            <h2 class="featured-title">{{ latest[0].title }}</h2>
+            <p class="featured-subtitle">{{ latest[0].subtitle }}</p>
+            <div class="featured-meta">
+                <span>{{ latest[0].author }}</span>
+                <span>&middot;</span>
+                <span>{{ latest[0].read_time_minutes }} min read</span>
+            </div>
+        </div>
+    </a>
+    {% endif %}
+
+    <!-- 3 more recent articles in grid -->
+    {% if latest[1:] %}
+    <div class="card-grid">
+        {% for article in latest[1:] %}
+        <a href="/article/{{ article.slug }}" class="article-card">
+            {% if article.hero_image %}
+            <div class="card-image">
+                <img src="{{ article.hero_image }}" alt="{{ article.hero_image_alt or article.title }}" loading="lazy">
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <span class="badge badge-{{ article.category }}">{{ categories[article.category].name if article.category in categories else article.category }}</span>
+                <h3 class="card-title">{{ article.title }}</h3>
+                <p class="card-subtitle">{{ article.subtitle }}</p>
+                <div class="card-meta">
+                    <span>{{ article.read_time_minutes }} min read</span>
+                    <span>&middot;</span>
+                    <span>{{ article.published_date }}</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</section>
+{% endif %}
+
+<!-- Category Sections -->
+{% for cat_slug, cat_articles in by_category.items() %}
+{% if cat_articles %}
+<section class="section container">
+    <div class="section-header">
+        <h2 class="section-title">{{ categories[cat_slug].name }}</h2>
+        <a href="/category/{{ cat_slug }}" class="section-link">View all &rarr;</a>
+    </div>
+    <div class="card-grid">
+        {% for article in cat_articles %}
+        <a href="/article/{{ article.slug }}" class="article-card">
+            {% if article.hero_image %}
+            <div class="card-image">
+                <img src="{{ article.hero_image }}" alt="{{ article.hero_image_alt or article.title }}" loading="lazy">
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <span class="badge badge-{{ article.category }}">{{ categories[article.category].name if article.category in categories else article.category }}</span>
+                <h3 class="card-title">{{ article.title }}</h3>
+                <p class="card-subtitle">{{ article.subtitle }}</p>
+                <div class="card-meta">
+                    <span>{{ article.read_time_minutes }} min read</span>
+                    <span>&middot;</span>
+                    <span>{{ article.published_date }}</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endfor %}
+
+<!-- Newsletter Signup -->
+<section class="newsletter-section container">
+    <div class="newsletter-inner">
+        <h2>The Weekly Brief</h2>
+        <p>Creator economy intelligence, delivered every Monday.</p>
+        <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Newsletter signup coming soon!');">
+            <input type="email" class="newsletter-input" placeholder="Your email" required>
+            <button type="submit" class="newsletter-btn">Subscribe</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

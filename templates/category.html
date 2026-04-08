@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} — The Creator Report{% endblock %}
+{% block meta_description %}{{ category.description }} — expert analysis from The Creator Report.{% endblock %}
+{% block canonical_path %}/category/{{ category_slug }}{% endblock %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "{{ category.name }} — The Creator Report",
+    "description": "{{ category.description }}",
+    "url": "{{ site_url }}/category/{{ category_slug }}"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="category-page">
+    <div class="container">
+        <header class="category-header">
+            <h1 class="category-title">{{ category.name }}</h1>
+            <p class="category-desc">{{ category.description }}</p>
+        </header>
+
+        {% if articles %}
+        <div class="card-grid">
+            {% for article in articles %}
+            <a href="/article/{{ article.slug }}" class="article-card">
+                {% if article.hero_image %}
+                <div class="card-image">
+                    <img src="{{ article.hero_image }}" alt="{{ article.hero_image_alt or article.title }}" loading="lazy">
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <span class="badge badge-{{ article.category }}">{{ categories[article.category].name if article.category in categories else article.category }}</span>
+                    <h3 class="card-title">{{ article.title }}</h3>
+                    <p class="card-subtitle">{{ article.subtitle }}</p>
+                    <div class="card-meta">
+                        <span>{{ article.read_time_minutes }} min read</span>
+                        <span>&middot;</span>
+                        <span>{{ article.published_date }}</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">No articles in this category yet.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
