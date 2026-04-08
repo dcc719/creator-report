@@ -766,6 +766,32 @@
       "referrer": "http://localhost:5003/article/celebrity-creators-onlyfans-2025",
       "timestamp": "2026-04-07T18:39:25.984827+00:00",
       "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+    },
+    {
+      "id": "1320ecca-9c8f-4a3f-aa6f-37134471a8b7",
+      "event": "time_on_page",
+      "slug": "/",
+      "category": "",
+      "value": "25600",
+      "utm_source": "",
+      "utm_medium": "",
+      "utm_campaign": "",
+      "referrer": "http://localhost:5003/article/celebrity-creators-onlyfans-2025",
+      "timestamp": "2026-04-08T01:45:58.618249+00:00",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+    },
+    {
+      "id": "d0575e81-edf8-4430-a103-12f286ae1f40",
+      "event": "time_on_page",
+      "slug": "/",
+      "category": "",
+      "value": "79849",
+      "utm_source": "",
+      "utm_medium": "",
+      "utm_campaign": "",
+      "referrer": "",
+      "timestamp": "2026-04-08T02:09:06.892781+00:00",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
     }
   ]
 }

@@ -118,14 +118,16 @@
 {% endfor %}
 
 <!-- Newsletter Signup -->
-<section class="newsletter-section container">
-    <div class="newsletter-inner">
-        <h2>The Weekly Brief</h2>
-        <p>Creator economy intelligence, delivered every Monday.</p>
-        <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Newsletter signup coming soon!');">
-            <input type="email" class="newsletter-input" placeholder="Your email" required>
-            <button type="submit" class="newsletter-btn">Subscribe</button>
-        </form>
+<section class="newsletter-section">
+    <div class="container">
+        <div class="newsletter-inner">
+            <h2>Get Weekly Intelligence</h2>
+            <p>The latest reporting on creator economy trends, platform changes, and strategy. Delivered every Monday.</p>
+            <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Newsletter signup coming soon!');">
+                <input type="email" class="newsletter-input" placeholder="your@email.com" required>
+                <button type="submit" class="newsletter-btn">Subscribe</button>
+            </form>
+        </div>
     </div>
 </section>
 {% endblock %}

@@ -101,6 +101,21 @@
   });
 
   // ---------------------------------------------------------------------------
+  // Image error handling - graceful fallback
+  // ---------------------------------------------------------------------------
+  document.addEventListener('error', function (e) {
+    if (e.target.tagName === 'IMG') {
+      var img = e.target;
+      // Add error class to parent for CSS fallback styling
+      if (img.parentElement) {
+        img.parentElement.classList.add('image-error');
+      }
+      // Track broken image
+      track('image_error', { value: img.src });
+    }
+  }, true);
+
+  // ---------------------------------------------------------------------------
   // Time on page
   // ---------------------------------------------------------------------------
   var pageStart = Date.now();

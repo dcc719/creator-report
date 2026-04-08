@@ -136,12 +136,12 @@
 
         <!-- Hero Image -->
         {% if article.hero_image %}
-        <div class="article-hero">
-            <img src="{{ article.hero_image }}" alt="{{ article.hero_image_alt or article.title }}">
+        <figure class="article-hero" role="img" aria-label="{{ article.hero_image_alt or article.title }}">
+            <img src="{{ article.hero_image }}" alt="{{ article.hero_image_alt or article.title }}" loading="eager">
             {% if article.hero_image_credit %}
-            <span class="hero-credit">{{ article.hero_image_credit }}</span>
+            <figcaption class="hero-credit">Image via {{ article.hero_image_credit }}</figcaption>
             {% endif %}
-        </div>
+        </figure>
         {% endif %}
 
         <!-- Key Stats (if present) -->
