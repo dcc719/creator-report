@@ -1101,6 +1101,7 @@ img { max-width: 100%; display: block; }
   }
   .featured-card {
     grid-template-columns: 1fr;
+    max-height: none;
   }
   .featured-image {
     max-height: 340px;
