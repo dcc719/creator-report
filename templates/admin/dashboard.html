@@ -1,0 +1,76 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Dashboard</h1>
+    <p>Overview of The Creator Report</p>
+</div>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="label">Published</div>
+        <div class="value">{{ published|length }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Drafts</div>
+        <div class="value">{{ drafts|length }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">In Queue</div>
+        <div class="value">{{ queue_articles|length }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Total Views</div>
+        <div class="value">{{ "{:,}".format(total_views) }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">CTA Clicks</div>
+        <div class="value">{{ "{:,}".format(total_cta) }}</div>
+    </div>
+</div>
+
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+    <h2 style="font-size:1rem;">Recent Articles</h2>
+    <a href="{{ url_for('admin_article_new') }}" class="btn btn-primary">+ New Article</a>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr><th>Title</th><th>Category</th><th>Status</th><th>Views</th><th>Date</th><th></th></tr>
+        </thead>
+        <tbody>
+            {% for a in articles[:10] %}
+            <tr>
+                <td><a href="{{ url_for('admin_article_edit', slug=a.slug) }}">{{ a.title[:60] }}</a></td>
+                <td>{{ categories[a.category].name if a.category in categories else a.category }}</td>
+                <td><span class="badge badge-{{ a.status }}">{{ a.status }}</span></td>
+                <td>{{ a.views or 0 }}</td>
+                <td>{{ a.published_date }}</td>
+                <td><a href="{{ url_for('admin_article_edit', slug=a.slug) }}" class="btn btn-secondary btn-sm">Edit</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if queue_articles %}
+<h2 style="font-size:1rem; margin:2rem 0 1rem;">Pending Approval</h2>
+{% for q in queue_articles %}
+<div class="queue-card">
+    <h3>{{ q.title }}</h3>
+    <div class="meta">{{ q.category }} &middot; {{ q.author }} &middot; {{ q.get('read_time_minutes', 5) }} min read</div>
+    <div class="preview">{{ q.subtitle }}</div>
+    <div class="actions">
+        <form method="POST" action="{{ url_for('admin_queue_approve', filename=q._filename) }}" style="display:inline;">
+            <button type="submit" class="btn btn-success btn-sm">Approve & Publish</button>
+        </form>
+        <form method="POST" action="{{ url_for('admin_queue_reject', filename=q._filename) }}" style="display:inline;">
+            <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+        </form>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}

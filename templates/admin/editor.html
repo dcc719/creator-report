@@ -1,0 +1,196 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ "Edit: " ~ article.title if article else "New Article" }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ "Edit Article" if article else "New Article" }}</h1>
+    {% if article %}<p><a href="/article/{{ article.slug }}" target="_blank">View live &rarr;</a></p>{% endif %}
+</div>
+
+<form method="POST" id="article-form">
+    <div class="form-row">
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" name="title" class="form-control" value="{{ article.title if article else '' }}" required>
+        </div>
+        <div class="form-group">
+            <label>Slug</label>
+            <input type="text" name="slug" class="form-control" value="{{ article.slug if article else '' }}" placeholder="auto-generated from title">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Subtitle</label>
+        <input type="text" name="subtitle" class="form-control" value="{{ article.subtitle if article else '' }}">
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label>Category</label>
+            <select name="category" class="form-control">
+                {% for slug, cat in categories.items() %}
+                <option value="{{ slug }}" {% if article and article.category == slug %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Author</label>
+            <input type="text" name="author" class="form-control" value="{{ article.author if article else 'The Creator Report' }}">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label>Published Date</label>
+            <input type="date" name="published_date" class="form-control" value="{{ article.published_date if article else '' }}">
+        </div>
+        <div class="form-group">
+            <label>Read Time (min)</label>
+            <input type="number" name="read_time_minutes" class="form-control" value="{{ article.read_time_minutes if article else 5 }}" min="1" max="60">
+        </div>
+    </div>
+
+    <!-- Content editing with tabs -->
+    <div class="form-group">
+        <label>Content</label>
+        <div class="tabs">
+            <button type="button" class="tab active" onclick="switchTab('visual')">Visual</button>
+            <button type="button" class="tab" onclick="switchTab('html')">HTML</button>
+            <button type="button" class="tab" onclick="switchTab('markdown')">Markdown</button>
+            <button type="button" class="tab" onclick="switchTab('preview')">Preview</button>
+        </div>
+
+        <div id="tab-visual" class="tab-content active">
+            <div class="editor-toolbar">
+                <button type="button" class="toolbar-btn" onclick="execCmd('bold')" title="Bold"><b>B</b></button>
+                <button type="button" class="toolbar-btn" onclick="execCmd('italic')" title="Italic"><i>I</i></button>
+                <button type="button" class="toolbar-btn" onclick="execCmd('underline')" title="Underline"><u>U</u></button>
+                <button type="button" class="toolbar-btn" onclick="execCmd('formatBlock', 'h2')" title="Heading 2">H2</button>
+                <button type="button" class="toolbar-btn" onclick="execCmd('formatBlock', 'h3')" title="Heading 3">H3</button>
+                <button type="button" class="toolbar-btn" onclick="execCmd('formatBlock', 'blockquote')" title="Quote">&ldquo;</button>
+                <button type="button" class="toolbar-btn" onclick="execCmd('insertUnorderedList')" title="List">&#8226;</button>
+                <button type="button" class="toolbar-btn" onclick="insertLink()" title="Link">&#128279;</button>
+                <button type="button" class="toolbar-btn" onclick="insertImage()" title="Image">&#128247;</button>
+            </div>
+            <div class="editor-content" contenteditable="true" id="visual-editor">{{ article.content_html|safe if article and article.content_html else '' }}</div>
+        </div>
+
+        <div id="tab-html" class="tab-content">
+            <textarea name="content_html" class="form-control" id="html-editor" style="min-height:400px; font-family:monospace; font-size:0.8rem;">{{ article.content_html if article else '' }}</textarea>
+        </div>
+
+        <div id="tab-markdown" class="tab-content">
+            <textarea name="content_md" class="form-control" id="md-editor" style="min-height:400px; font-family:monospace; font-size:0.85rem;">{{ article.content_md if article else '' }}</textarea>
+        </div>
+
+        <div id="tab-preview" class="tab-content">
+            <div class="preview-pane" id="preview-pane"></div>
+        </div>
+    </div>
+
+    <!-- Images -->
+    <div class="form-group">
+        <label>Hero Image URL</label>
+        <input type="text" name="hero_image" class="form-control" value="{{ article.hero_image if article else '' }}" placeholder="https://...">
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label>Image Alt Text</label>
+            <input type="text" name="hero_image_alt" class="form-control" value="{{ article.hero_image_alt if article else '' }}">
+        </div>
+        <div class="form-group">
+            <label>Image Credit</label>
+            <input type="text" name="hero_image_credit" class="form-control" value="{{ article.hero_image_credit if article else '' }}">
+        </div>
+    </div>
+
+    <!-- SEO -->
+    <div class="form-row">
+        <div class="form-group">
+            <label>Meta Title</label>
+            <input type="text" name="meta_title" class="form-control" value="{{ article.meta_title if article else '' }}" maxlength="60">
+        </div>
+        <div class="form-group">
+            <label>Meta Description</label>
+            <input type="text" name="meta_description" class="form-control" value="{{ article.meta_description if article else '' }}" maxlength="160">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Tags (comma separated)</label>
+        <input type="text" name="tags" class="form-control" value="{{ article.tags|join(', ') if article else '' }}">
+    </div>
+
+    <div class="form-group">
+        <label>Pull Quotes (one per line)</label>
+        <textarea name="pull_quotes" class="form-control" rows="3">{{ article.pull_quotes|join('\n') if article else '' }}</textarea>
+    </div>
+
+    <!-- Status + Actions -->
+    <div class="form-actions">
+        <select name="status" class="form-control" style="width:auto;">
+            <option value="draft" {% if not article or article.status == 'draft' %}selected{% endif %}>Draft</option>
+            <option value="published" {% if article and article.status == 'published' %}selected{% endif %}>Published</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Save Article</button>
+        <a href="{{ url_for('admin_articles') }}" class="btn btn-secondary">Cancel</a>
+        {% if article %}
+        <form method="POST" action="{{ url_for('admin_article_delete', slug=article.slug) }}" style="display:inline; margin-left:auto;"
+              onsubmit="return confirm('Delete this article? This cannot be undone.');">
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+        </form>
+        {% endif %}
+    </div>
+</form>
+
+<script>
+// Tab switching
+function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.target.classList.add('active');
+
+    // Sync content between editors
+    var visual = document.getElementById('visual-editor');
+    var htmlEl = document.getElementById('html-editor');
+
+    if (name === 'html') {
+        htmlEl.value = visual.innerHTML;
+    } else if (name === 'visual') {
+        if (htmlEl.value) visual.innerHTML = htmlEl.value;
+    } else if (name === 'preview') {
+        document.getElementById('preview-pane').innerHTML = visual.innerHTML || htmlEl.value;
+    }
+}
+
+// Rich text commands
+function execCmd(cmd, val) {
+    if (cmd === 'formatBlock') {
+        document.execCommand('formatBlock', false, '<' + val + '>');
+    } else {
+        document.execCommand(cmd, false, val || null);
+    }
+    document.getElementById('visual-editor').focus();
+}
+
+function insertLink() {
+    var url = prompt('Enter URL:');
+    if (url) document.execCommand('createLink', false, url);
+}
+
+function insertImage() {
+    var url = prompt('Enter image URL:');
+    if (url) document.execCommand('insertImage', false, url);
+}
+
+// Sync visual editor to hidden field on submit
+document.getElementById('article-form').addEventListener('submit', function() {
+    var visual = document.getElementById('visual-editor');
+    var htmlField = document.getElementById('html-editor');
+    if (visual.innerHTML && !htmlField.value) {
+        htmlField.value = visual.innerHTML;
+    }
+});
+</script>
+{% endblock %}

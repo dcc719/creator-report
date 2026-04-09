@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin{% endblock %} | CR Admin</title>
+    <style>
+        :root {
+            --bg: #0f0f0f;
+            --surface: #1a1a1a;
+            --surface2: #242424;
+            --border: #2a2a2a;
+            --text: #e5e5e5;
+            --text2: #999;
+            --accent: #e63946;
+            --accent-hover: #d62839;
+            --green: #22c55e;
+            --amber: #f59e0b;
+            --blue: #3b82f6;
+            --radius: 6px;
+            --ff: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--ff); background: var(--bg); color: var(--text); line-height: 1.5; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* Layout */
+        .admin-layout { display: flex; min-height: 100vh; }
+        .admin-sidebar {
+            width: 220px; background: var(--surface); border-right: 1px solid var(--border);
+            padding: 1.5rem 0; position: fixed; top: 0; bottom: 0; overflow-y: auto;
+        }
+        .admin-main { margin-left: 220px; flex: 1; padding: 2rem; min-height: 100vh; }
+
+        /* Sidebar */
+        .sb-brand { padding: 0 1.25rem 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+        .sb-brand h2 { font-size: 0.85rem; font-weight: 700; color: var(--text); letter-spacing: 0.05em; }
+        .sb-brand span { font-size: 0.65rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.1em; }
+        .sb-nav a {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.6rem 1.25rem; font-size: 0.85rem; color: var(--text2);
+            transition: all 0.15s; border-left: 2px solid transparent;
+        }
+        .sb-nav a:hover, .sb-nav a.active {
+            color: var(--text); background: var(--surface2); border-left-color: var(--accent);
+            text-decoration: none;
+        }
+        .sb-nav a .icon { font-size: 1rem; width: 20px; text-align: center; }
+        .sb-footer { position: absolute; bottom: 1rem; left: 0; right: 0; padding: 0 1.25rem; }
+        .sb-footer a { font-size: 0.75rem; color: var(--text2); }
+
+        /* Content */
+        .page-header { margin-bottom: 2rem; }
+        .page-header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .page-header p { color: var(--text2); font-size: 0.85rem; }
+
+        /* Cards */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 1.25rem;
+        }
+        .stat-card .label { font-size: 0.7rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+        .stat-card .value { font-size: 1.75rem; font-weight: 700; }
+
+        /* Tables */
+        .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 0.7rem; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+        td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: var(--surface2); }
+
+        /* Badges */
+        .badge { display: inline-block; font-size: 0.65rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge-published { background: rgba(34,197,94,0.15); color: var(--green); }
+        .badge-draft { background: rgba(245,158,11,0.15); color: var(--amber); }
+        .badge-queued { background: rgba(59,130,246,0.15); color: var(--blue); }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.5rem 1rem; font-size: 0.8rem; font-weight: 600; border: none;
+            border-radius: var(--radius); cursor: pointer; transition: all 0.15s;
+            font-family: var(--ff); text-decoration: none;
+        }
+        .btn:hover { text-decoration: none; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { border-color: var(--text2); }
+        .btn-danger { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .btn-danger:hover { background: rgba(239,68,68,0.25); }
+        .btn-success { background: rgba(34,197,94,0.15); color: var(--green); }
+        .btn-success:hover { background: rgba(34,197,94,0.25); }
+        .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.7rem; }
+
+        /* Forms */
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+        .form-control {
+            width: 100%; padding: 0.65rem 0.85rem; background: var(--surface2); border: 1px solid var(--border);
+            border-radius: var(--radius); color: var(--text); font-family: var(--ff); font-size: 0.9rem;
+            transition: border-color 0.15s;
+        }
+        .form-control:focus { outline: none; border-color: var(--accent); }
+        select.form-control { appearance: none; cursor: pointer; }
+        textarea.form-control { min-height: 120px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .form-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+
+        /* Flash messages */
+        .flash { padding: 0.75rem 1rem; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); border-radius: var(--radius); color: var(--green); font-size: 0.85rem; margin-bottom: 1.5rem; }
+
+        /* Queue cards */
+        .queue-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 1.5rem; margin-bottom: 1rem;
+        }
+        .queue-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .queue-card .meta { font-size: 0.8rem; color: var(--text2); margin-bottom: 1rem; }
+        .queue-card .preview { font-size: 0.85rem; color: var(--text2); line-height: 1.6; margin-bottom: 1rem; max-height: 100px; overflow: hidden; }
+        .queue-card .actions { display: flex; gap: 0.5rem; }
+
+        /* Editor */
+        .editor-content {
+            min-height: 400px; padding: 1rem; background: var(--surface2); border: 1px solid var(--border);
+            border-radius: var(--radius); color: var(--text); font-family: var(--ff); font-size: 0.9rem;
+            line-height: 1.7; overflow-y: auto;
+        }
+        .editor-content:focus { outline: none; border-color: var(--accent); }
+        .editor-toolbar {
+            display: flex; gap: 0.25rem; padding: 0.5rem; background: var(--surface);
+            border: 1px solid var(--border); border-bottom: none; border-radius: var(--radius) var(--radius) 0 0;
+        }
+        .editor-toolbar + .editor-content { border-radius: 0 0 var(--radius) var(--radius); }
+        .toolbar-btn {
+            padding: 0.35rem 0.6rem; background: none; border: 1px solid transparent;
+            border-radius: 3px; color: var(--text2); cursor: pointer; font-size: 0.8rem; font-weight: 600;
+        }
+        .toolbar-btn:hover { background: var(--surface2); color: var(--text); border-color: var(--border); }
+
+        /* Preview pane */
+        .preview-pane {
+            background: #fff; color: #111; padding: 2rem; border-radius: var(--radius);
+            font-family: Georgia, serif; line-height: 1.8; font-size: 1rem; min-height: 300px;
+        }
+        .preview-pane h2, .preview-pane h3 { font-family: var(--ff); margin: 1.5em 0 0.5em; }
+        .preview-pane img { max-width: 100%; border-radius: 4px; }
+        .preview-pane blockquote { border-left: 3px solid #e63946; padding-left: 1rem; margin: 1rem 0; color: #555; font-style: italic; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+        .tab {
+            padding: 0.6rem 1.25rem; font-size: 0.8rem; font-weight: 600; color: var(--text2);
+            border-bottom: 2px solid transparent; cursor: pointer; background: none; border-top: none; border-left: none; border-right: none;
+            font-family: var(--ff);
+        }
+        .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-sidebar { display: none; }
+            .admin-main { margin-left: 0; padding: 1rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .stat-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-layout">
+        {% block sidebar %}
+        <aside class="admin-sidebar">
+            <div class="sb-brand">
+                <h2>Creator Report</h2>
+                <span>Admin Panel</span>
+            </div>
+            <nav class="sb-nav">
+                <a href="{{ url_for('admin_dashboard') }}" class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                    <span class="icon">&#9632;</span> Dashboard
+                </a>
+                <a href="{{ url_for('admin_articles') }}" class="{% if request.endpoint in ('admin_articles', 'admin_article_edit', 'admin_article_new') %}active{% endif %}">
+                    <span class="icon">&#9998;</span> Articles
+                </a>
+                <a href="{{ url_for('admin_queue') }}" class="{% if request.endpoint == 'admin_queue' %}active{% endif %}">
+                    <span class="icon">&#9776;</span> Queue
+                </a>
+                <a href="{{ url_for('admin_homepage') }}" class="{% if request.endpoint == 'admin_homepage' %}active{% endif %}">
+                    <span class="icon">&#9733;</span> Homepage
+                </a>
+            </nav>
+            <div class="sb-footer">
+                <a href="{{ url_for('home') }}">View Site</a> &middot;
+                <a href="{{ url_for('admin_logout') }}">Logout</a>
+            </div>
+        </aside>
+        {% endblock %}
+        <main class="admin-main">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for msg in messages %}
+            <div class="flash">{{ msg }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

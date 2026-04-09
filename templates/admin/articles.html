@@ -1,0 +1,35 @@
+{% extends "admin/base.html" %}
+{% block title %}Articles{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+        <h1>Articles</h1>
+        <p>{{ articles|length }} total articles</p>
+    </div>
+    <a href="{{ url_for('admin_article_new') }}" class="btn btn-primary">+ New Article</a>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr><th>Title</th><th>Category</th><th>Author</th><th>Status</th><th>Views</th><th>Date</th><th></th></tr>
+        </thead>
+        <tbody>
+            {% for a in articles %}
+            <tr>
+                <td><a href="{{ url_for('admin_article_edit', slug=a.slug) }}">{{ a.title[:65] }}</a></td>
+                <td>{{ categories[a.category].name if a.category in categories else a.category }}</td>
+                <td>{{ a.author }}</td>
+                <td><span class="badge badge-{{ a.status }}">{{ a.status }}</span></td>
+                <td>{{ a.views or 0 }}</td>
+                <td>{{ a.published_date }}</td>
+                <td>
+                    <a href="{{ url_for('admin_article_edit', slug=a.slug) }}" class="btn btn-secondary btn-sm">Edit</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

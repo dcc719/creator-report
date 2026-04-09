@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | CR Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #0f0f0f; color: #e5e5e5; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .login-box { width: 360px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 2.5rem; }
+        h1 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .sub { font-size: 0.8rem; color: #999; margin-bottom: 2rem; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; font-size: 0.7rem; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; }
+        input { width: 100%; padding: 0.7rem; background: #242424; border: 1px solid #2a2a2a; border-radius: 6px; color: #e5e5e5; font-family: inherit; font-size: 0.9rem; }
+        input:focus { outline: none; border-color: #e63946; }
+        button { width: 100%; padding: 0.75rem; background: #e63946; color: white; border: none; border-radius: 6px; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-top: 0.5rem; }
+        button:hover { background: #d62839; }
+        .flash { padding: 0.6rem; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; color: #ef4444; font-size: 0.8rem; margin-bottom: 1rem; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>Creator Report</h1>
+        <p class="sub">Admin Panel</p>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}{% for msg in messages %}<div class="flash">{{ msg }}</div>{% endfor %}{% endif %}
+        {% endwith %}
+        <form method="POST">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" autocomplete="username" required autofocus>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" autocomplete="current-password" required>
+            </div>
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+{% extends "admin/base.html" %}
+{% block title %}Homepage Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Homepage</h1>
+    <p>Control which articles appear first on the homepage</p>
+</div>
+
+<form method="POST">
+    <div class="form-group">
+        <label>Featured Article</label>
+        <select name="featured_slug" class="form-control">
+            <option value="">Auto (most recent)</option>
+            {% for a in articles %}
+            <option value="{{ a.slug }}" {% if config.get('featured_slug') == a.slug %}selected{% endif %}>
+                {{ a.title[:70] }} ({{ a.published_date }})
+            </option>
+            {% endfor %}
+        </select>
+        <p style="font-size:0.75rem; color:var(--text2); margin-top:0.35rem;">This article appears as the large featured card at the top of the homepage.</p>
+    </div>
+
+    <div class="form-group">
+        <label>Pinned Articles (comma-separated slugs)</label>
+        <input type="text" name="pinned_slugs" class="form-control" value="{{ config.get('pinned_slugs', [])|join(', ') }}" placeholder="article-slug-1, article-slug-2">
+        <p style="font-size:0.75rem; color:var(--text2); margin-top:0.35rem;">These appear in the "Latest" grid below the featured article, before chronological articles.</p>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save Homepage Settings</button>
+    </div>
+</form>
+
+<h2 style="font-size:1rem; margin:2.5rem 0 1rem;">Current Articles (by date)</h2>
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr><th>Slug</th><th>Title</th><th>Category</th><th>Date</th><th>Views</th></tr>
+        </thead>
+        <tbody>
+            {% for a in articles[:20] %}
+            <tr>
+                <td><code style="font-size:0.75rem; color:var(--accent);">{{ a.slug }}</code></td>
+                <td>{{ a.title[:50] }}</td>
+                <td>{{ categories[a.category].name if a.category in categories else a.category }}</td>
+                <td>{{ a.published_date }}</td>
+                <td>{{ a.views or 0 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
