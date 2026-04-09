@@ -253,6 +253,67 @@
             </div>
         </section>
         {% endif %}
+
+        <!-- Comments Section -->
+        <section class="comments-section">
+            <div class="comments-header">
+                <h2>Discussion</h2>
+                <span class="comments-count" id="comments-count">0 comments</span>
+            </div>
+            <form class="comment-form" id="comment-form" onsubmit="event.preventDefault(); submitComment('{{ article.slug }}');">
+                <textarea class="comment-input" id="comment-input" placeholder="Share your take..." rows="3" maxlength="1000" required></textarea>
+                <div class="comment-form-footer">
+                    <input type="text" class="comment-name" id="comment-name" placeholder="Your name" maxlength="50" required>
+                    <button type="submit" class="comment-submit">Post Comment</button>
+                </div>
+            </form>
+            <div class="comments-list" id="comments-list"></div>
+        </section>
     </div>
 </article>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function loadComments(slug) {
+  fetch('/api/comments/' + slug)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var list = document.getElementById('comments-list');
+      var count = document.getElementById('comments-count');
+      var comments = data.comments || [];
+      count.textContent = comments.length + (comments.length === 1 ? ' comment' : ' comments');
+      list.innerHTML = '';
+      comments.forEach(function(c) {
+        var div = document.createElement('div');
+        div.className = 'comment';
+        div.innerHTML = '<div class="comment-meta"><strong>' + escHtml(c.name) + '</strong><span>' + c.date + '</span></div><p>' + escHtml(c.text) + '</p>';
+        list.appendChild(div);
+      });
+    }).catch(function() {});
+}
+
+function submitComment(slug) {
+  var text = document.getElementById('comment-input').value.trim();
+  var name = document.getElementById('comment-name').value.trim();
+  if (!text || !name) return;
+  fetch('/api/comments/' + slug, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({name: name, text: text})
+  }).then(function(r) { return r.json(); })
+    .then(function() {
+      document.getElementById('comment-input').value = '';
+      loadComments(slug);
+    }).catch(function() {});
+}
+
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+loadComments('{{ article.slug }}');
+</script>
 {% endblock %}

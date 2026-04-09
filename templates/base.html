@@ -57,16 +57,35 @@
     <!-- Navigation -->
     <nav class="nav">
         <div class="nav-inner container">
-            <a href="/" class="nav-logo">The Creator Report</a>
-            <button class="nav-toggle" aria-label="Toggle menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">
-                <span></span><span></span><span></span>
-            </button>
+            <a href="/" class="nav-logo">
+                <span class="nav-logo-mark">CR</span>
+                <span class="nav-logo-text">The Creator Report</span>
+            </a>
             <div class="nav-links">
                 <a href="/" class="nav-link">Latest</a>
-                <a href="/category/platform-news" class="nav-link">Platform News</a>
+                <a href="/category/platform-news" class="nav-link">Platforms</a>
                 <a href="/category/money" class="nav-link">Money</a>
-                <a href="/category/opinion" class="nav-link">Opinion</a>
-                <a href="/about" class="nav-link">More</a>
+                <a href="/category/creator-stories" class="nav-link">Stories</a>
+                <a href="/category/trends" class="nav-link">Trends</a>
+            </div>
+            <button class="nav-toggle" aria-label="Toggle menu" onclick="this.classList.toggle('active'); document.getElementById('nav-dropdown').classList.toggle('open')">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        <!-- Full dropdown menu -->
+        <div class="nav-dropdown" id="nav-dropdown">
+            <div class="container nav-dropdown-inner">
+                <div class="nav-dropdown-col">
+                    <h4>Categories</h4>
+                    {% for slug, cat in categories.items() %}
+                    <a href="/category/{{ slug }}">{{ cat.name }}</a>
+                    {% endfor %}
+                </div>
+                <div class="nav-dropdown-col">
+                    <h4>Resources</h4>
+                    <a href="/about">About</a>
+                    <a href="/sitemap.xml">Sitemap</a>
+                </div>
             </div>
         </div>
     </nav>

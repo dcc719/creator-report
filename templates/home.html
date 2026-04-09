@@ -24,9 +24,8 @@
 <!-- Hero -->
 <section class="hero">
     <div class="container">
-        <p class="hero-label">Intelligence for the Creator Economy</p>
-        <h1 class="hero-title">The Creator<br>Report</h1>
-        <p class="hero-subtitle">Data, analysis, and expert perspective for creators and the teams that scale them.</p>
+        <h1 class="hero-title">The Creator Report</h1>
+        <p class="hero-subtitle">The business of being a creator. News, money, trends, and the strategies behind the biggest names online.</p>
     </div>
 </section>
 
@@ -121,13 +120,88 @@
 <section class="newsletter-section">
     <div class="container">
         <div class="newsletter-inner">
-            <h2>Get Weekly Intelligence</h2>
-            <p>The latest reporting on creator economy trends, platform changes, and strategy. Delivered every Monday.</p>
-            <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Newsletter signup coming soon!');">
+            <h2>Get the Monday Briefing</h2>
+            <p>Creator economy news, money moves, and platform shifts. One email, every Monday.</p>
+            <form class="newsletter-form" id="newsletter-form-inline" onsubmit="event.preventDefault(); handleNewsletterSignup(this);">
                 <input type="email" class="newsletter-input" placeholder="your@email.com" required>
                 <button type="submit" class="newsletter-btn">Subscribe</button>
             </form>
         </div>
     </div>
 </section>
+
+<!-- Newsletter Popup (shows after 45s or 50% scroll) -->
+<div class="nl-popup-overlay" id="nl-popup-overlay">
+    <div class="nl-popup">
+        <button class="nl-popup-close" onclick="closeNewsletterPopup()">&times;</button>
+        <h3>Don't miss the story.</h3>
+        <p>The Monday Briefing: creator economy intel delivered weekly.</p>
+        <form id="newsletter-form-popup" onsubmit="event.preventDefault(); handleNewsletterSignup(this); closeNewsletterPopup();">
+            <input type="email" class="newsletter-input" placeholder="your@email.com" required>
+            <button type="submit" class="newsletter-btn" style="width:100%; margin-top:0.5rem;">Subscribe Free</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── Top Stories Rotation ──
+(function() {
+  var featured = document.querySelector('.featured-card');
+  if (!featured) return;
+  var cards = document.querySelectorAll('.card-grid .article-card');
+  if (cards.length < 2) return;
+
+  var allItems = [featured];
+  cards.forEach(function(c) { allItems.push(c); });
+
+  // Rotate featured every 8 seconds
+  var idx = 0;
+  setInterval(function() {
+    idx = (idx + 1) % Math.min(allItems.length, 4);
+    // Just add a subtle fade class for visual hint
+    featured.style.opacity = '0.96';
+    setTimeout(function() { featured.style.opacity = '1'; }, 300);
+  }, 8000);
+})();
+
+// ── Newsletter Popup ──
+var nlPopupShown = sessionStorage.getItem('cr_nl_popup') === '1';
+
+function showNewsletterPopup() {
+  if (nlPopupShown) return;
+  nlPopupShown = true;
+  sessionStorage.setItem('cr_nl_popup', '1');
+  document.getElementById('nl-popup-overlay').classList.add('visible');
+}
+
+function closeNewsletterPopup() {
+  document.getElementById('nl-popup-overlay').classList.remove('visible');
+}
+
+function handleNewsletterSignup(form) {
+  var email = form.querySelector('input[type="email"]').value;
+  // Track the signup
+  if (window.crTrack) window.crTrack('newsletter_signup', { email_domain: email.split('@')[1] });
+  form.innerHTML = '<p style="color:var(--accent);font-weight:600;">You\'re in. See you Monday.</p>';
+}
+
+// Trigger popup after 45s or 50% scroll
+setTimeout(showNewsletterPopup, 45000);
+var scrollTriggered = false;
+window.addEventListener('scroll', function() {
+  if (scrollTriggered) return;
+  var pct = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+  if (pct > 0.5) {
+    scrollTriggered = true;
+    showNewsletterPopup();
+  }
+});
+
+// Close popup on overlay click
+document.getElementById('nl-popup-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeNewsletterPopup();
+});
+</script>
 {% endblock %}

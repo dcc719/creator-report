@@ -10,7 +10,8 @@ from datetime import datetime, timezone
 from functools import wraps
 
 from flask import (
-    Flask, render_template, request, jsonify, abort, Response, url_for
+    Flask, render_template, request, jsonify, abort, Response, url_for,
+    session, redirect, flash
 )
 
 app = Flask(__name__)
@@ -33,6 +34,25 @@ CATEGORIES = {
     "tools": {"name": "Tools", "description": "Tech, apps, equipment, and workflows that power creator businesses"},
     "opinion": {"name": "Opinion", "description": "Sharp takes, industry commentary, and predictions"},
 }
+
+# ---------------------------------------------------------------------------
+# Admin auth
+# ---------------------------------------------------------------------------
+
+ADMIN_USER = os.environ.get("CR_ADMIN_USER", "admin")
+ADMIN_PASS = os.environ.get("CR_ADMIN_PASS", "changeme")
+
+QUEUE_DIR = os.path.join(DATA_DIR, "queue")
+
+
+def admin_required(f):
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        if not session.get("admin"):
+            return redirect(url_for("admin_login"))
+        return f(*args, **kwargs)
+    return wrapped
+
 
 # ---------------------------------------------------------------------------
 # Markdown converter
@@ -202,6 +222,50 @@ def article_page(slug):
 def about():
     return render_template("about.html")
 
+
+# ---------------------------------------------------------------------------
+# Comments
+# ---------------------------------------------------------------------------
+
+COMMENTS_FILE = os.path.join(DATA_DIR, "comments.json")
+
+def load_comments():
+    if os.path.exists(COMMENTS_FILE):
+        with open(COMMENTS_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+def save_comments(data):
+    with open(COMMENTS_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+
+@app.route("/api/comments/<slug>", methods=["GET"])
+def get_comments(slug):
+    comments = load_comments()
+    return jsonify({"comments": comments.get(slug, [])})
+
+@app.route("/api/comments/<slug>", methods=["POST"])
+def post_comment(slug):
+    data = request.get_json() or {}
+    name = data.get("name", "").strip()[:50]
+    text = data.get("text", "").strip()[:1000]
+    if not name or not text:
+        return jsonify({"error": "Name and comment required"}), 400
+
+    comments = load_comments()
+    if slug not in comments:
+        comments[slug] = []
+
+    comment = {
+        "id": str(uuid.uuid4())[:8],
+        "name": name,
+        "text": text,
+        "date": datetime.now(timezone.utc).strftime("%b %d, %Y"),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    comments[slug].append(comment)
+    save_comments(comments)
+    return jsonify({"ok": True, "comment": comment})
 
 # ---------------------------------------------------------------------------
 # Sitemap
